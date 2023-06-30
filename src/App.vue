@@ -8,9 +8,11 @@ interface Student {
   age: string
 }
 const user = Store.user()
+
 const init = async () => {
   const res = await http.get<Student>({ url: 'localhost:5999' })
 }
+
 let a = 10
 
 let as = 10

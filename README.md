@@ -13,7 +13,7 @@
 >    import { defineConfig } from 'vite'
 >    // 如果编辑器提示 path 模块找不到，则可以安装一下 @types/node -> npm i @types/node -D
 >    import { resolve } from 'path'
->      
+>         
 >    // https://vitejs.dev/config/
 >    export default defineConfig({
 >      plugins: [vue()],
@@ -333,11 +333,11 @@
 >      age: string;
 >    }
 >    const user = Store.user();
->      
+>         
 >    const init = async () => {
 >      const res = await http.get<Student>({ url: "localhost:5999" });
 >    };
->      
+>         
 >    onMounted(() => {
 >      init();
 >    });
@@ -729,15 +729,197 @@
 >
 > 2. 配置husky
 >
->    
+>    > 1. 执行 npm i husky -D 下载相关依赖
+>    >
+>    > 2. 创建 Git hooks 执行 npx husky install
+>    >
+>    >    ![image-20230629233248712](C:\Users\wmq39\AppData\Roaming\Typora\typora-user-images\image-20230629233248712.png)
 >
-> 
+> 3. #### 配置lint-staged
 >
-> 
+>    lint-staged 这个工具一般结合 husky 来使用，它可以让 husky 的 `hook` 触发的命令只作用于 `git add`那些文件（即 git 暂存区的文件），而不会影响到其他文件。
+>
+>    > 1. 执行npm i lint-staged -D下载依赖
+>    >
+>    > 2. 在.husky文件夹下的pre-commit里面配置
+>    >
+>    >    ```makefile
+>    >    #!/usr/bin/env sh
+>    >    . "$(dirname -- "$0")/_/husky.sh"
+>    >       
+>    >    npx lint-staged
+>    >    ```
+>    >
+>    >    
+>    >
+>    > 3. 在 `package.json`里增加 lint-staged 配置项
+>    >
+>    >    ```json
+>    >    {
+>    >      "name": "vue3-app",
+>    >      "private": true,
+>    >      "version": "0.0.0",
+>    >      "type": "module",
+>    >      "scripts": {
+>    >        "dev": "vite",
+>    >        "build": "vue-tsc && vite build",
+>    >        "preview": "vite preview",
+>    >        "format": "npx prettier --write .",
+>    >        "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx --fix",
+>    >        "prepare": "husky install"
+>    >      },
+>    >      "lint-staged": { //这行命令表示：只对 git 暂存区的 .vue、.js、.ts 文件执行 eslint --fix。
+>    >        "*.{vue,js,ts}": "eslint --fix"
+>    >      },
+>    >      "dependencies": {
+>    >        "@types/node": "^20.3.1",
+>    >        "axios": "^1.4.0",
+>    >        "pinia": "^2.1.4",
+>    >        "vue": "^3.2.47",
+>    >        "vue-router": "^4.2.2"
+>    >      },
+>    >      "devDependencies": {
+>    >        "@typescript-eslint/eslint-plugin": "^5.60.1",
+>    >        "@typescript-eslint/parser": "^5.60.1",
+>    >        "@vitejs/plugin-vue": "^4.1.0",
+>    >        "eslint": "^8.43.0",
+>    >        "eslint-config-prettier": "^8.8.0",
+>    >        "eslint-plugin-prettier": "^4.2.1",
+>    >        "eslint-plugin-vue": "^9.15.1",
+>    >        "husky": "^8.0.0",
+>    >        "lint-staged": "^13.2.3",
+>    >        "prettier": "^2.8.8",
+>    >        "sass": "^1.63.6",
+>    >        "typescript": "^4.9.3",
+>    >        "vite": "^4.2.0",
+>    >        "vue-tsc": "^1.2.0"
+>    >      }
+>    >    }
+>    >    ```
+>
 
-### 6.6.使用 commit message
+### 6.6. commit message格式化规范
+
+> 1. 简介
+>
+>    前面我们已经统一代码规范，并且在提交代码时进行强约束来保证仓库代码质量。多人协作的项目中，在提交代码这个环节，也存在一种情况：不能保证每个人对提交信息的准确描述，因此会出现提交信息紊乱、风格不一致的情况。
+>
+>    如果 `git commit` 的描述信息精准，在后期维护和 Bug 处理时会变得有据可查，项目开发周期内还可以根据规范的提交信息快速生成开发日志，从而方便我们追踪项目和把控进度
+>
+> 2. commit message 由 Header、Body、Footer 组成
+>
+>    ```
+>    <Header>
+>    
+>    <Body>
+>    
+>    <Footer>
+>    ```
+>
+>    - Header 部分包括三个字段 type（必需）、scope（可选）和 subject（必需）
+>
+>      ```
+>      <type>(<scope>): <subject>
+>      ```
+>
+>    - type用于说明 commit 的提交类型（必须是以下几种之一）
+>
+>      |    值    |                             描述                             |
+>      | :------: | :----------------------------------------------------------: |
+>      |   feat   |                         新增一个功能                         |
+>      |   fix    |                         修复一个 Bug                         |
+>      |   docs   |                           文档变更                           |
+>      |  style   |       代码格式（不影响功能，例如空格、分号等格式修正）       |
+>      | refactor |                           代码重构                           |
+>      |   perf   |                           改善性能                           |
+>      |   test   |                             测试                             |
+>      |  build   | 变更项目构建或外部依赖（例如 scopes: webpack、gulp、npm 等） |
+>      |    ci    | 更改持续集成软件的配置文件和 package 中的 scripts 命令，例如 scopes: Travis, Circle 等 |
+>      |  chore   |                    变更构建流程或辅助工具                    |
+>      |  revert  |                           代码回退                           |
+>
+>    - scope 用于指定本次 commit 影响的范围。scope 依据项目而定，例如在业务项目中可以依据菜单或者功能模块划分，如果是组件库开发，则可以依据组件划分。（scope 可省略）
+>
+>      subject 是本次 commit 的简洁描述，长度约定在 50 个字符以内，通常遵循以下几个规范：
+>
+>      - 用动词开头，第一人称现在时表述，例如：change 代替 changed 或 changes
+>      - 第一个字母小写
+>      - 结尾不加句号（.）
+>
+>    - body是对本次 commit 的详细描述，可以分成多行。（body 可省略）跟 subject 类似，用动词开头，body 应该说明修改的原因和更改前后的行为对比。
+>
+>    - footer
+>
+>      如果本次提交的代码是突破性的变更或关闭缺陷，则 Footer 必需，否则可以省略。
+>
+>      - 突破性的变更
+>
+>        当前代码与上一个版本有突破性改变，则 Footer 以 BREAKING CHANGE 开头，后面是对变动的描述、以及变动的理由。
+>
+>      - 关闭缺陷
+>
+>        如果当前提交是针对特定的 issue，那么可以在 Footer 部分填写需要关闭的单个 issue 或一系列 issues。
+>
+>    - 参考列子
+>
+>      - fix
+>
+>        ```
+>        fix(compile): couple of unit tests for IE9
+>        
+>        Older IEs serialize html uppercased, but IE9 does not...
+>        Would be better to expect case insensitive, unfortunately jasmine does
+>        not allow to user regexps for throw expectations.
+>        
+>        Closes #392
+>        Breaks foo.bar api, foo.baz should be used instead
+>        ```
+>
+>      - feat
+>
+>        ```
+>        feat(browser): onUrlChange event (popstate/hashchange/polling)
+>        
+>        Added new event to browser:
+>        - forward popstate event if available
+>        - forward hashchange event if popstate not available
+>        - do polling when neither popstate nor hashchange available
+>        
+>        Breaks $browser.onHashChange, which was removed (use onUrlChange instead)
+>        ```
+>
+>      - style
+>
+>        ```
+>        style(location): add couple of missing semi colons
+>        ```
+>
+>      - chore
+>
+>        ```
+>        chore(release): v3.4.2
+>        ```
+>
+>    - 规范commit的好处
+>
+>      1. 首行就是简洁实用的关键信息，方便在 git history 中快速浏览。
+>      2. 具有更加详细的 body 和 footer，可以清晰的看出某次提交的目的和影响。
+>      3. 可以通过 type 过滤出想要查找的信息，也可以通过关键字快速查找相关提交。
+>      4. 可以直接从 commit 生成 change log。
 
 ### 6.7.集成 Commitizen 实现规范提交
+
+> 上面介绍了 Angular 规范提交的格式，初次接触的同学咋一看可能会觉得复杂，其实不然，如果让大家在 `git commit` 的时候严格按照上面的格式来写，肯定是有压力的，首先得记住不同的类型到底是用来定义什么，subject 怎么写，body 怎么写，footer 要不要写等等问题，懒才是程序员第一生产力，为此我们使用 Commitizen 工具来帮助我们自动生成 commit message 格式，从而实现规范提交。
+>
+> > Commitizen 是一个帮助撰写规范 commit message 的工具。它有一个命令行工具 cz-cli。
+>
+> 1. 执行 npm install commitizen -D 下载依赖
+>
+> 2. 初始化项目
+>
+>    成功安装 Commitizen 后，我们用 **cz-conventional-changelog** 适配器来初始化项目：
+>
+>    > 执行命令npx commitizen init cz-conventional-changelog --save-dev --save-exact初始化项目
 
 ### 6.8.使用 cz-customizable 自定义提交
 
