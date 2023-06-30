@@ -1067,6 +1067,10 @@
 >
 >    建议大家结合项目实际情况来自定义配置提交规则，例如很多时候我们不需要写长描述，公司内部的代码仓库也不需要管理 issue，那么可以把询问 body 和 footer 的步骤跳过（在 `.cz-config.js` 中修改成 `skipQuestions: ['body', 'footer']`）。
 >
+>    注意:此时需要将package.json中的type:module删除不然不会成功
+>
+>    此时执行git cz就可以提交代码
+>
 >    
 >
 >    
