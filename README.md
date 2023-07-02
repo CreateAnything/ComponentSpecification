@@ -1116,3 +1116,229 @@
 >    ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/QQ%E5%9B%BE%E7%89%8720230702213908.png)
 >
 >    因为已在项目中集成 commitizen，建议大家用 `git cz` 来代替 `git commit` 提交代码，可以保证提交信息规范。
+
+## 7.Vite配置
+
+### 7.1基础配置
+
+#### 7.1.1vite配置项目别名
+
+> 在vite.config.ts中配置alias别名
+>
+> ```json
+> import vue from '@vitejs/plugin-vue'
+> import { defineConfig } from 'vite'
+> // 如果编辑器提示 path 模块找不到，则可以安装一下 @types/node -> npm i @types/node -D
+> import { resolve } from 'path'
+> 
+> // https://vitejs.dev/config/
+> export default defineConfig({
+>   plugins: [vue()],
+>   resolve: {
+>     alias: {
+>       '@': resolve(__dirname, 'src') //设置别名
+>     }
+>   }
+> })
+> 
+> ```
+>
+> 如果使用ts的话需要在ts.config.ts中配置path属性如下
+>
+> ```json
+> {
+>   "compilerOptions": {
+>     "target": "ESNext",
+>     "baseUrl": "./",
+>     "paths": {
+>       "@/*": ["src/*"]
+>     },
+>     "useDefineForClassFields": true,
+>     "module": "ESNext",
+>     "moduleResolution": "Node",
+>     "strict": true,
+>     "jsx": "preserve",
+>     "resolveJsonModule": true,
+>     "isolatedModules": true,
+>     "esModuleInterop": true,
+>     "lib": ["ESNext", "DOM"],
+>     "skipLibCheck": true,
+>     "noEmit": true
+>   },
+>   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+>   "references": [{ "path": "./tsconfig.node.json" }]
+> }
+> 
+> ```
+
+#### 7.1.2.配置公共基础路径
+
+> 开发或生产环境服务的公共基础路径。
+>
+> ```typescript
+> import { defineConfig } from 'vite'
+> 
+> export default defineConfig({
+>   base: './' // 开发或生产环境服务的公共基础路径
+> })
+> ```
+>
+> 一般开发中都设置为./
+
+### 7.2.打包基础配置
+
+#### 7.2.1.配置打包输出目录
+
+> 指定打包文件的输出目录。默认值为 `dist` ，当 `dist` 被占用或公司有统一命名规范时，可进行调整。
+>
+> ```typescript
+> import { defineConfig } from 'vite'
+> 
+> export default defineConfig({
+>   build: {
+>     outDir: 'build' // 打包文件的输出目录
+>   }
+> })
+> ```
+
+#### 7.2.2.配置生成静态资源的存放目录
+
+> 指定生成静态资源的存放目录。默认值为 `assets` ，可根据需要进行调整。
+>
+> ```typescript
+> import { defineConfig } from 'vite'
+> 
+> export default defineConfig({
+>   build: {
+>     assetsDir: 'static' // 静态资源的存放目录
+>   }
+> })
+> ```
+
+#### 7.2.3.对打包输出文件进行分类
+
+> 将文件分门别类，js，css这些资源目录分别打包到对应的文件夹下
+>
+> ```typescript
+> export default defineConfig({
+>   build: {
+>     rollupOptions: {
+>       output: {
+>         chunkFileNames: 'js/[name]-[hash].js', // 引入文件名的名称
+>         entryFileNames: 'js/[name]-[hash].js', // 包的入口文件名称
+>         assetFileNames: '[ext]/[name]-[hash].[ext]' // 资源文件像 字体，图片等
+>       }
+>     }
+>   }
+> })
+> ```
+>
+> 分类前
+>
+> ![https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702231724.png](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702231724.png)
+>
+> 分类后
+>
+> ![https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702232013.png](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702232013.png)
+
+### 7.3.项目打包优化
+
+#### 7.3.1.图片转 base64 编码
+
+> 图片转 base64 编码的阈值。为防止过多的 http 请求，Vite 会将小于此阈值的图片转为 base64 格式，可根据实际需求进行调整。
+>
+> ```typescript
+> import { defineConfig } from 'vite'
+> export default defineConfig({
+>   build: {
+>     assetsInlineLimit: 4096 // 图片转 base64 编码的阈值
+>   }
+> })
+> ```
+
+#### 7.3.2.使用rollup-plugin-visualizer
+
+> rollup-plugin-visualizer是一个打包体积分析插件，对应webpack中的`webpack-bundle-analyzer`。配置好后运行构建命令会生成一个`stats.html`。
+>
+> 1. 执行npm i rollup-plugin-visualizer -D下载依赖
+>
+> 2. 在vite.config.ts中使用
+>
+>    ```typescript
+>    import vue from '@vitejs/plugin-vue'
+>    import { resolve } from 'path'
+>    import { visualizer } from 'rollup-plugin-visualizer'
+>    import { defineConfig } from 'vite'
+>    
+>    // https://vitejs.dev/config/
+>    export default defineConfig({
+>      plugins: [vue(), visualizer({ open: true })],
+>    })
+>    
+>    ```
+>
+>    此时执行npm run build会在根目录生成一个stats的分析html打开后图下图所示
+>
+>    ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702232856.png)
+>
+>    根据上图可发现vue相关的依赖包占比较大，可根据这些信息进行相关模块的打包优化
+
+#### 7.3.3.拆包
+
+> 这里有一个自己的个人见解： 如果不同模块使用的插件基本相同那就尽可能打包在同一个文件中，减少http请求，如果不同模块使用不同插件明显，那就分成不同模块打包。这是一个矛盾体。
+> 这里使用的是最小化拆分包。如果是前者可以直接选择返回'vendor'。
+>
+> ```typescript
+> import { defineConfig } from 'vite'
+> export default defineConfig({
+>   build: {
+>   output: {
+>     manualChunks(id) {
+>       if (id.includes("node_modules")) {
+>         // 让每个插件都打包成独立的文件
+>         return id .toString() .split("node_modules/")[1] .split("/")[0] .toString(); 
+>       }
+>     }
+>   }
+> })
+> ```
+>
+> 此时打包的分析图为
+>
+> ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702233617.png)
+>
+> 目录为
+>
+> ![https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702233724.png](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/20230702233724.png)
+>
+> 此时很明显可以看出使用manualChunks的时候可以将node_modules中的相关依赖进行分包打包操作用来减少http请求
+
+#### 7.3.4.去除debugger
+
+> 在开发中可能在代码中书写很多console.log()这样容易造成内存泄漏,为了避免这种情况我们需要在打包过程中主动将这些打印去除
+>
+> 1. 执行 npm i terser -D 下载依赖
+>
+> 2. 在vite.config.ts中进行配置
+>
+>    ```typescript
+>    import { defineConfig } from 'vite'
+>    export default defineConfig({
+>      build: {
+>        terserOptions: {
+>          minify: 'terser',
+>          compress: {
+>            drop_console: true, //去除生产环境的打印
+>            drop_debugger: true
+>          }
+>        },      
+>      }
+>    })
+>    ```
+
+#### 7.3.5.使用external进行优化
+
+> 
+
+
+

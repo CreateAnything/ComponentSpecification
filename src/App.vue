@@ -17,6 +17,8 @@ let a = 10
 
 let as = 10
 
+console.log(a, as)
+
 onMounted(() => {
   init()
 })
