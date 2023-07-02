@@ -13,7 +13,7 @@
 >    import { defineConfig } from 'vite'
 >    // 如果编辑器提示 path 模块找不到，则可以安装一下 @types/node -> npm i @types/node -D
 >    import { resolve } from 'path'
->            
+>                  
 >    // https://vitejs.dev/config/
 >    export default defineConfig({
 >      plugins: [vue()],
@@ -333,11 +333,11 @@
 >      age: string;
 >    }
 >    const user = Store.user();
->            
+>                  
 >    const init = async () => {
 >      const res = await http.get<Student>({ url: "localhost:5999" });
 >    };
->            
+>                  
 >    onMounted(() => {
 >      init();
 >    });
@@ -462,7 +462,7 @@
 >    }
 >    ```
 >
->    ![image-20230627235129801](C:\Users\wmq39\AppData\Roaming\Typora\typora-user-images\image-20230627235129801.png)
+>    ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/image-20230627235129801.png)
 >
 > 4. 在package.json中配置统一eslint错误修复
 >
@@ -733,7 +733,7 @@
 >    >
 >    > 2. 创建 Git hooks 执行 npx husky install
 >    >
->    >    ![image-20230629233248712](C:\Users\wmq39\AppData\Roaming\Typora\typora-user-images\image-20230629233248712.png)
+>    >    ![https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/8a782038cb84cf73c7d898bb8411ea1.png](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/8a782038cb84cf73c7d898bb8411ea1.png)
 >
 > 3. #### 配置lint-staged
 >
@@ -746,7 +746,7 @@
 >    >    ```makefile
 >    >    #!/usr/bin/env sh
 >    >    . "$(dirname -- "$0")/_/husky.sh"
->    >          
+>    >                
 >    >    npx lint-staged
 >    >    ```
 >    >
@@ -810,9 +810,9 @@
 >
 >    ```
 >    <Header>
->       
+>             
 >    <Body>
->       
+>             
 >    <Footer>
 >    ```
 >
@@ -872,19 +872,19 @@
 >        - do polling when neither popstate nor hashchange available
 >        
 >        Breaks $browser.onHashChange, which was removed (use onUrlChange instead)
->        ```
+>       ```
 >    
 >     - style
 >    
 >       ```
 >        style(location): add couple of missing semi colons
->        ```
+>       ```
 >        
 >      - chore
 >    
 >        ```
 >        chore(release): v3.4.2
->               ```
+>        ```
 >    
 >    - 规范commit的好处
 >
@@ -961,7 +961,7 @@
 >    >
 >    > 以前我们提交代码都是 `git commit -m "xxx"`，现在改为 `git cz`，然后按照终端操作提示，逐步填入信息，就能自动生成规范的 commit message
 >    >
->    > ![image-20230630213751867](C:\Users\wmq39\AppData\Roaming\Typora\typora-user-images\image-20230630213751867.png)
+>    > ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/image-20230630213751867.png)
 >    >
 
 ### 6.8.使用 cz-customizable 自定义提交
@@ -1001,7 +1001,7 @@
 >        { value: 'chore', name: 'chore:    对构建过程或辅助工具和库的更改（不影响源文件、测试用例）' },
 >        { value: 'revert', name: 'revert:   回滚 commit' }
 >      ],
->    
+>          
 >      // scope 类型（定义之后，可通过上下键选择）
 >      scopes: [
 >        ['components', '组件相关'],
@@ -1020,15 +1020,15 @@
 >          name: `${value.padEnd(30)} (${description})`
 >        }
 >      }),
->    
+>          
 >      // 是否允许自定义填写 scope，在 scope 选择的时候，会有 empty 和 custom 可以选择。
 >      // allowCustomScopes: true,
->    
+>          
 >      // allowTicketNumber: false,
 >      // isTicketNumberRequired: false,
 >      // ticketNumberPrefix: 'TICKET-',
 >      // ticketNumberRegExp: '\\d{1,5}',
->    
+>          
 >      // 针对每一个 type 去定义对应的 scopes，例如 fix
 >      /*
 >      scopeOverrides: {
@@ -1052,7 +1052,7 @@
 >        footer: '列举出所有变更的 ISSUES CLOSED（可选）。 例如: #31, #34：\n',
 >        confirmCommit: '确认提交？'
 >      },
->    
+>          
 >      // 设置只有 type 选择了 feat 或 fix，才询问 breaking message
 >      allowBreakingChanges: ['feat', 'fix'],
 >      // 跳过要询问的步骤
@@ -1070,9 +1070,49 @@
 >    注意:此时需要将package.json中的type:module删除不然不会成功
 >
 >    此时执行git cz就可以提交代码
->
->    
+>   
+>       
 >
 >    
 
 ### 6.9.集成 commitlint 验证提交规范
+
+> 1. 安装 @commitlint/config-conventional 和 @commitlint/cli
+>
+>    ```text
+>    npm i @commitlint/config-conventional @commitlint/cli -D
+>    ```
+>
+> 2. #### 配置 commitlint
+>
+>    - 创建 commitlint.config.js 文件 在项目根目录下创建 `commitlint.config.js` 文件，并填入以下内容：
+>
+>      ```text
+>      module.exports = { extends: ['@commitlint/config-conventional'] }
+>      ```
+>
+>    - 或直接使用快捷命令：
+>
+>      ```text
+>      echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+>      ```
+>
+> 3. 使用 husky 的 `commit-msg` hook 触发验证提交信息的命令
+>    我们使用 husky 命令在 `.husky` 目录下创建 `commit-msg` 文件，并在此执行 commit message 的验证命令。
+>
+>    ```text
+>    npx husky add .husky/commit-msg "npx --no-install commitlint --edit $1"
+>    ```
+>
+> 4. 不符合规范的提交信息
+>
+>    如下图，提交信息 `test commitlint` 不符合规范，提交失败
+>
+>    ![https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/QQ%E6%88%AA%E5%9B%BE20230702213559.png](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/QQ%E6%88%AA%E5%9B%BE20230702213559.png)
+>
+> 5. 符合规范的提交信息
+>    如下图，提交信息 `test: commitlint test` 符合规范，成功提交到仓库
+>
+>    ![](https://gitee.com/wang-maoquan-zdm/md-images/raw/master/images/QQ%E5%9B%BE%E7%89%8720230702213908.png)
+>
+>    因为已在项目中集成 commitizen，建议大家用 `git cz` 来代替 `git commit` 提交代码，可以保证提交信息规范。
